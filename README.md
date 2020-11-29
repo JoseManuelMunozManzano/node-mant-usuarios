@@ -14,3 +14,5 @@
 - Borrado de archivos
   - Eliminado físico de la base de datos
   - Eliminación por estado en un campo de la colección
+
+#### En cada branch habrá una parte del proyecto
