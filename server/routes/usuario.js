@@ -6,7 +6,29 @@ const Usuario = require('../models/usuario');
 const app = express();
 
 app.get('/usuario', function (req, res) {
-  res.json('get Usuario');
+  // Los parámetros opcionales están en un objeto llamado query
+  const desde = +req.query.desde || 0;
+  const limite = +req.query.limite || 5;
+
+  // Busca todos, pero se salta los primeros x registros y luego muestra
+  // los siguientes y registros
+
+  Usuario.find({})
+    .skip(desde)
+    .limit(limite)
+    .exec((err, usuarios) => {
+      if (err) {
+        return res.status(400).json({
+          ok: false,
+          err,
+        });
+      }
+
+      res.json({
+        ok: true,
+        usuarios,
+      });
+    });
 });
 
 app.post('/usuario', function (req, res) {
