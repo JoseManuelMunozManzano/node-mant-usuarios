@@ -1,4 +1,5 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const Usuario = require('../models/usuario');
 
 const app = express();
@@ -13,7 +14,7 @@ app.post('/usuario', function (req, res) {
   const usuario = new Usuario({
     nombre: persona.nombre,
     email: persona.email,
-    password: persona.password,
+    password: bcrypt.hashSync(persona.password, 10),
     role: persona.role,
   });
 
@@ -24,6 +25,9 @@ app.post('/usuario', function (req, res) {
         err,
       });
     }
+
+    // Ver en el fuente models/usuario.js una forma mejor de no enviar el campo password
+    //usuarioDB.password = null;
 
     res.json({
       ok: true,

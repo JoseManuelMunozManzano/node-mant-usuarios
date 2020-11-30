@@ -41,6 +41,17 @@ const usuarioSchema = new Schema({
   },
 });
 
+// Obtener un objeto que no tiene el campo password.
+// La idea es no mandar al usuario el campo password.
+// NOTA: No usar arrow function porque necesitamos el this
+usuarioSchema.methods.toJSON = function () {
+  const user = this;
+  const userObject = user.toObject();
+  delete userObject.password;
+
+  return userObject;
+};
+
 usuarioSchema.plugin(uniqueValidator, { message: '{PATH} debe de ser único' });
 
 module.exports = mongoose.model('Usuario', usuarioSchema);
