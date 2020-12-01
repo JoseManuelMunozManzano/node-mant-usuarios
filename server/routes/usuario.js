@@ -6,27 +6,27 @@ const Usuario = require('../models/usuario');
 const app = express();
 
 app.get('/usuario', function (req, res) {
-  // Los parámetros opcionales están en un objeto llamado query
   const desde = +req.query.desde || 0;
   const limite = +req.query.limite || 5;
-
-  // Busca todos, pero se salta los primeros x registros y luego muestra
-  // los siguientes y registros
 
   Usuario.find({})
     .skip(desde)
     .limit(limite)
-    .exec((err, usuarios) => {
-      if (err) {
-        return res.status(400).json({
-          ok: false,
-          err,
-        });
-      }
-
+    .exec()
+    .then(async usuarios => {
+      // El count recibe una condición que debería ser la misma
+      // que la de arriba, para que los cuente de la misma manera
+      const conteo = await Usuario.countDocuments({});
       res.json({
         ok: true,
         usuarios,
+        cuantos: conteo,
+      });
+    })
+    .catch(err => {
+      res.status(400).json({
+        ok: false,
+        err,
       });
     });
 });
@@ -49,9 +49,6 @@ app.post('/usuario', function (req, res) {
       });
     }
 
-    // Ver en el fuente models/usuario.js una forma mejor de no enviar el campo password
-    //usuarioDB.password = null;
-
     res.json({
       ok: true,
       usuario: usuarioDB,
@@ -62,13 +59,6 @@ app.post('/usuario', function (req, res) {
 app.put('/usuario/:id', function (req, res) {
   const id = req.params.id;
 
-  // No actualizar password ni campo google
-  // Una forma es borrar del body esas propiedades
-  //      const body = req.body;
-  //      delete body.password
-  //      delete body.google
-  // Pero es ineficiente cuando son muchos objetos
-  // Otra forma de hacerlo es con la librería undescore.js
   const body = _.pick(req.body, ['nombre', 'email', 'img', 'role', 'estado']);
 
   Usuario.findByIdAndUpdate(
