@@ -9,7 +9,9 @@ app.get('/usuario', function (req, res) {
   const desde = +req.query.desde || 0;
   const limite = +req.query.limite || 5;
 
-  Usuario.find({})
+  // Podemos poner que campos queremos mostrar
+  // El id no hace falta informarlo
+  Usuario.find({}, 'nombre email role estado google img')
     .skip(desde)
     .limit(limite)
     .exec()
