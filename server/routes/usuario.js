@@ -9,12 +9,13 @@ app.get('/usuario', function (req, res) {
   const desde = +req.query.desde || 0;
   const limite = +req.query.limite || 5;
 
-  Usuario.find({}, 'nombre email role estado google img')
+  // Sólo usuarios activos
+  Usuario.find({estado: true}, 'nombre email role estado google img')
     .skip(desde)
     .limit(limite)
     .exec()
     .then(async usuarios => {
-      const conteo = await Usuario.countDocuments({});
+      const conteo = await Usuario.countDocuments({estado: true});
       res.json({
         ok: true,
         usuarios,
@@ -80,10 +81,10 @@ app.put('/usuario/:id', function (req, res) {
 });
 
 app.delete('/usuario/:id', function (req, res) {
-  // 1. Borrar un registro físicamente
+  // 2. Borrar un registro logicamente, cambiando el estado a false
   const id = req.params.id;
 
-  Usuario.findByIdAndRemove(id)
+  Usuario.findByIdAndUpdate(id, { estado: false }, { new: true })
     .then(usuarioBorrado => {
       if (usuarioBorrado) {
         res.json({
